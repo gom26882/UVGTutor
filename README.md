@@ -215,7 +215,7 @@ Los atributos de `Usuario` que serán heredados por `Estudiante` y `Tutor` será
 
 Los métodos que necesiten ser utilizados desde otras partes del sistema serán `public`
 
-```
+
 
 [Volver al índice](#índice)
 
