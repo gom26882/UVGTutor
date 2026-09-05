@@ -6,41 +6,33 @@ import helmet from 'helmet'
 import cors from 'cors'
 
 import { limiter } from '../middlewares/rate.limit.js'
+import authRoutes from '../src/routes/auth.routes.js'
 
 const configs = (app) => {
     app.use(express.json())
-
-    app.use(express.urlencoded({
-        extended: true
-    }))
-
+    app.use(express.urlencoded({ extended: true }))
     app.use(cors())
     app.use(helmet())
     app.use(limiter)
     app.use(morgan('dev'))
 }
 
-export const initServer = async () => {
+const routes = (app) => {
+    app.use('/v1/auth', authRoutes)
+}
+
+export const initServer = () => {
     const app = express()
 
     try {
         configs(app)
+        routes(app)
 
-        app.get('/', (req, res) => {
-            res.status(200).send({
-                success: true,
-                message: 'UVGTutor API funcionando'
-            })
-        })
-
-        const port = process.env.PORT || 3000
-
-        app.listen(port, () => {
-            console.log(`Server | running on port ${port}`)
+        app.listen(process.env.PORT, () => {
+            console.log(`Server | running on port ${process.env.PORT}`)
         })
 
     } catch (err) {
-        console.error('Server | initialization failed', err)
-        throw err
+        console.error('Server init failed', err)
     }
 }
