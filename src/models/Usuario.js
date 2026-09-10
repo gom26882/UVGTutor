@@ -32,16 +32,13 @@ usuarioSchema.methods.actualizarPerfil = function(nombre, correo) {
     this.correo = correo
 }
 
-usuarioSchema.methods.getId = function() {
-    return this._id.toString()
+usuarioSchema.statics.getUserById = async function(id) {
+    return await this.findById(id)
 }
 
-usuarioSchema.methods.getNombre = function() {
-    return this.nombre
-}
-
-usuarioSchema.methods.getCorreo = function() {
-    return this.correo
+usuarioSchema.methods.updateUser = function(nombre, correo) {
+    this.nombre = nombre
+    this.correo = correo
 }
 
 const Usuario = mongoose.model('Usuario', usuarioSchema)

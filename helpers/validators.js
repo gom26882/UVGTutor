@@ -16,3 +16,9 @@ export const loginValidator = [
     body('contrasena').notEmpty().withMessage('La contraseña no puede estar vacía'),
     validateErrors
 ]
+
+export const updateProfileValidator = [
+    body('nombre').notEmpty().withMessage('El nombre no puede estar vacío'),
+    body('correo').notEmpty().withMessage('El correo no puede estar vacío').isEmail().withMessage('El correo no es válido'),
+    validateErrors
+]

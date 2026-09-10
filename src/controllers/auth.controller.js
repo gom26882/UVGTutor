@@ -19,13 +19,12 @@ export const register = async (req, res) => {
             usuario: {
                 id: usuario._id,
                 nombre: usuario.nombre,
-                correo: usuario.corre
+                correo: usuario.correo
             }
         })
 
     } catch (err) {
         console.error(err)
-        
         return res.status(500).send({success: false, message: 'Error al registrar al usuario'})
     }
 }
@@ -37,7 +36,7 @@ export const login = async (req, res) => {
         const usuario = await Usuario.findOne({correo}).select('+contrasena')
 
         if(!usuario){
-            return res.status(404).send({succes: false, message: 'Usuario no encoentrado'})
+            return res.status(404).send({success: false, message: 'Usuario no encontrado'})
         }
 
         const contrasenaValida = await checkPassword(
