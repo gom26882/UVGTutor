@@ -15,6 +15,7 @@ export const getUserById = async (req, res) =>{
         }})
 
     } catch (err){
+        console.error(err)
         return res.status(500).send({succes: false, message: 'Errror al obtener el usuario'})
     }
 }
@@ -41,6 +42,7 @@ export const updateUser = async (req, res) =>{
             }
         })
     }catch (err){
+        console.error(err)
         return res.status(500).send({succes: false, message:'Errro al actualizar el perfil'})
     }
 }

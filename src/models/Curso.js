@@ -1,42 +1,42 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const cursoSchema = new mongoose.Schema(
     {
-        codigo:{
+        codigo: {
             type: String,
             required: true,
-            trim: true
-
+            trim: true,
+            unique: true
         },
-        nombre:{
+
+        nombre: {
             type: String,
             required: true,
             trim: true
         }
+    },
+    {
+        versionKey: false
     }
 )
 
-cursoSchema.methods.addCurso = function(codigo, nombre){
-    this.codigo = codigo
-    this.nombre = nombre
+cursoSchema.statics.getAllCursos = async function() {
+    return await this.find()
 }
 
-cursoSchema.statics.getAllCursos = async function(){
-    return await this.find()    
-}
-
-cursoSchema.statics.getCursoById = async function(id){
+cursoSchema.statics.getCursoById = async function(id) {
     return await this.findById(id)
 }
 
-cursoSchema.methods.updateCurso = function(codigo, nombre){
+cursoSchema.methods.updateCurso = function(codigo, nombre) {
     this.codigo = codigo
     this.nombre = nombre
 }
 
-cursoSchema.statics.deleteCursoById = async function(id){
+cursoSchema.statics.deleteCursoById = async function(id) {
     return await this.findByIdAndDelete(id)
 }
 
 const Curso = mongoose.model('Curso', cursoSchema)
+
 export default Curso
