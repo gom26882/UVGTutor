@@ -31,3 +31,11 @@ export const existCodigoCurso = async (codigo) => {
         throw new Error(`El código ${codigo} ya está registrado`)
     }
 }
+
+export const existCarnet = async (carnet) => {
+    const estudianteExistente = await Estudiante.findOne({ carnet })
+
+    if (estudianteExistente) {
+        throw new Error(`El carnet ${carnet} ya está registrado`)
+    }
+}

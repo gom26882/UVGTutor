@@ -23,7 +23,8 @@ const usuarioSchema = new mongoose.Schema(
         }
     },
     {
-        timestamps: true
+        timestamps: true,
+        discriminatorKey: 'tipoUsuario'
     }
 )
 
