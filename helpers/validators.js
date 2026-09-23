@@ -1,6 +1,6 @@
 import { body } from 'express-validator'
 import { validateErrors } from './validate.errors.js'
-import { existEmail, existCodigoCurso } from './db.validator.js'
+import { existEmail, existCodigoCurso, existCarnet } from './db.validator.js'
 
 export const registerValidator = [
     body('nombre').notEmpty().withMessage('El nombre no puede estar vacío'),
@@ -32,5 +32,10 @@ export const cursoValidator = [
 export const updateCursoValidator = [
     body('codigo').optional().trim().notEmpty().withMessage('El código del curso no puede estar vacío'),
     body('nombre').optional().trim().notEmpty().withMessage('El nombre del curso no puede estar vacío'),
+    validateErrors
+]
+
+export const estudianteValidator = [
+    body('carnet').trim().notEmpty().withMessage('El carnet no puede estar vacío').isLength({ min: 5, max: 7 }).withMessage('El carnet debe tener 5 caracteres').custom(existCarnet),
     validateErrors
 ]
