@@ -1,5 +1,7 @@
-import Usuario  from "../models/Usuario.js"
-import Estudiante from "../models/Estudiante.js"
+import Usuario from '../models/Usuario.js'
+import Estudiante from '../models/Estudiante.js'
+import Tutor from '../models/Tutor.js'
+
 import { encrypt, checkPassword } from '../../utils/encrypt.js'
 import { generateJwt } from '../../utils/jwt.js'
 
@@ -10,7 +12,10 @@ export const register = async (req, res) => {
             correo,
             contrasena,
             tipoUsuario,
-            carnet
+            carnet,
+            experiencia,
+            precioHora,
+            modalidad
         } = req.body
 
         const contrasenaEncriptada = await encrypt(contrasena)
@@ -18,12 +23,27 @@ export const register = async (req, res) => {
         let usuario
 
         if (tipoUsuario === 'Estudiante') {
-
-            usuario = new Estudiante({nombre, correo, contrasena: contrasenaEncriptada, carnet })
-
+            usuario = new Estudiante({
+                nombre,
+                correo,
+                contrasena: contrasenaEncriptada,
+                carnet
+            })
+        } else if (tipoUsuario === 'Tutor') {
+            usuario = new Tutor({
+                nombre,
+                correo,
+                contrasena: contrasenaEncriptada,
+                experiencia,
+                precioHora,
+                modalidad
+            })
         } else {
-
-            usuario = new Usuario({ nombre, correo, contrasena: contrasenaEncriptada })
+            usuario = new Usuario({
+                nombre,
+                correo,
+                contrasena: contrasenaEncriptada
+            })
         }
 
         await usuario.save()
@@ -38,49 +58,47 @@ export const register = async (req, res) => {
                 tipoUsuario: usuario.tipoUsuario
             }
         })
-
     } catch (err) {
         console.error(err)
-        return res.status(500).send({success: false, message: 'Error al registrar usuario' })
+        return res.status(500).send({success: false, message: 'Error al registrar usuario'})
     }
 }
 
 export const login = async (req, res) => {
-    try{
-        const {correo, contrasena} = req.body
+    try {
+        const { correo, contrasena } = req.body
 
-        const usuario = await Usuario.findOne({correo}).select('+contrasena')
+        const usuario = await Usuario.findOne({ correo }).select('+contrasena')
 
-        if(!usuario){
+        if (!usuario) {
             return res.status(404).send({success: false, message: 'Usuario no encontrado'})
         }
 
-        const contrasenaValida = await checkPassword(
-            contrasena,
-            usuario.contrasena
-        )
+        const contrasenaValida = await checkPassword(contrasena, usuario.contrasena)
 
-        if(!contrasenaValida){
-            return res.status(401).send({succes: false, message: 'Constraseña incorrecta'})
+        if (!contrasenaValida) {
+            return res.status(401).send({success: false, message: 'Contraseña incorrecta'})
         }
 
         const token = generateJwt({
             uid: usuario._id,
-            correo: usuario.correo
+            correo: usuario.correo,
+            tipoUsuario: usuario.tipoUsuario
         })
 
         return res.status(200).send({
-            success: true, message: 'Inicio de sesión exitos',
+            success: true,
+            message: 'Inicio de sesión exitoso',
             usuario: {
                 id: usuario._id,
                 nombre: usuario.nombre,
-                correo: usuario.correo
-            }, token
+                correo: usuario.correo,
+                tipoUsuario: usuario.tipoUsuario
+            },
+            token
         })
-
-    } catch(err){
+    } catch (err) {
         console.error(err)
-
-        return res.status(500).send({success: false, message: 'Error al iniciar sesion'})
+        return res.status(500).send({success: false, message: 'Error al iniciar sesión'})
     }
 }

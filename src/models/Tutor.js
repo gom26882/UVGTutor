@@ -33,7 +33,7 @@ const tutorSchema = new mongoose.Schema(
                 type: Date
             }
         ]
-    },
+    }
 )
 
 tutorSchema.statics.getAllTutores = async function() {
@@ -41,7 +41,7 @@ tutorSchema.statics.getAllTutores = async function() {
 }
 
 tutorSchema.statics.getTutorById = async function(id) {
-    return await this.findById(id).populate('cursos')
+    return await this.findById(id)
 }
 
 tutorSchema.methods.updateTutor = function(experiencia, precioHora, modalidad) {
@@ -51,19 +51,33 @@ tutorSchema.methods.updateTutor = function(experiencia, precioHora, modalidad) {
 }
 
 tutorSchema.methods.agregarCurso = function(cursoId) {
-    const existe = this.cursos.some(
-        curso => curso.toString() === cursoId.toString()
+    const cursoExiste = this.cursos.some(
+        curso => curso.equals(cursoId)
     )
 
-    if (!existe) {
-        this.cursos.push(cursoId)
+    if (cursoExiste) {
+        return false
     }
+
+    this.cursos.push(cursoId)
+
+    return true
 }
 
 tutorSchema.methods.eliminarCurso = function(cursoId) {
-    this.cursos = this.cursos.filter(
-        curso => curso.toString() !== cursoId.toString()
+    const cursoExiste = this.cursos.some(
+        curso => curso.equals(cursoId)
     )
+
+    if (!cursoExiste) {
+        return false
+    }
+
+    this.cursos = this.cursos.filter(
+        curso => !curso.equals(cursoId)
+    )
+
+    return true
 }
 
 tutorSchema.methods.agregarHorario = function(horario) {
@@ -85,6 +99,7 @@ tutorSchema.methods.estaDisponible = function(horario) {
         disponible => disponible.getTime() === fecha
     )
 }
+
 
 const Tutor = Usuario.discriminator(
     'Tutor',

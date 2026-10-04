@@ -15,6 +15,12 @@ export const registerValidator = [
         .if(body('tipoUsuario').equals('Estudiante')).trim().notEmpty()
         .withMessage('El carnet no puede estar vacío').isLength({ min: 5, max: 5 })
         .withMessage('El carnet debe tener 5 caracteres').custom(existCarnet),
+    body('experiencia').if(body('tipoUsuario').equals('Tutor')).trim().notEmpty()
+        .withMessage('La experiencia no puede estar vacía'),
+    body('precioHora').if(body('tipoUsuario').equals('Tutor')).notEmpty().withMessage('El precio por hora no puede estar vacío')
+        .isFloat({ min: 0 }).withMessage('El precio por hora debe ser mayor o igual a 0'),
+    body('modalidad').if(body('tipoUsuario').equals('Tutor')).notEmpty().withMessage('La modalidad no puede estar vacía')
+        .isIn(['PRESENCIAL', 'VIRTUAL']).withMessage('La modalidad debe ser PRESENCIAL o VIRTUAL'),
     validateErrors
 ]
 
@@ -46,54 +52,23 @@ export const estudianteValidator = [
     body('carnet').trim().notEmpty().withMessage('El carnet no puede estar vacío').isLength({ min: 5, max: 7 }).withMessage('El carnet debe tener 5 caracteres').custom(existCarnet),
     validateErrors
 ]
-
 export const tutorValidator = [
-    body('experiencia')
-        .trim()
-        .notEmpty()
-        .withMessage('La experiencia no puede estar vacía'),
-
-    body('precioHora')
-        .notEmpty()
-        .withMessage('El precio por hora no puede estar vacío')
-        .isFloat({ min: 0 })
-        .withMessage('El precio debe ser mayor o igual a 0'),
-
-    body('modalidad')
-        .notEmpty()
-        .withMessage('La modalidad no puede estar vacía')
-        .isIn(['PRESENCIAL', 'VIRTUAL'])
+    body('experiencia').trim().notEmpty().withMessage('La experiencia no puede estar vacía'),
+    body('precioHora').notEmpty().withMessage('El precio por hora no puede estar vacío').isFloat({ min: 0 })
+        .withMessage('El precio por hora debe ser mayor o igual a 0'),
+    body('modalidad').notEmpty().withMessage('La modalidad no puede estar vacía').isIn(['PRESENCIAL', 'VIRTUAL'])
         .withMessage('La modalidad debe ser PRESENCIAL o VIRTUAL'),
-
     validateErrors
 ]
 
 export const updateTutorValidator = [
-    body('experiencia')
-        .optional()
-        .trim()
-        .notEmpty()
-        .withMessage('La experiencia no puede estar vacía'),
-
-    body('precioHora')
-        .optional()
-        .isFloat({ min: 0 })
-        .withMessage('El precio debe ser mayor o igual a 0'),
-
-    body('modalidad')
-        .optional()
-        .isIn(['PRESENCIAL', 'VIRTUAL'])
-        .withMessage('La modalidad debe ser PRESENCIAL o VIRTUAL'),
-
+    body('experiencia').optional().trim().notEmpty().withMessage('La experiencia no puede estar vacía'),
+    body('precioHora').optional().isFloat({ min: 0 }).withMessage('El precio por hora debe ser mayor o igual a 0'),
+    body('modalidad').optional().isIn(['PRESENCIAL', 'VIRTUAL']).withMessage('La modalidad debe ser PRESENCIAL o VIRTUAL'),
     validateErrors
 ]
 
 export const horarioValidator = [
-    body('horario')
-        .notEmpty()
-        .withMessage('El horario no puede estar vacío')
-        .isISO8601()
-        .withMessage('El horario debe ser una fecha válida'),
-
+    body('horario').notEmpty().withMessage('El horario no puede estar vacío').isISO8601().withMessage('El horario debe ser una fecha válida'),
     validateErrors
 ]
