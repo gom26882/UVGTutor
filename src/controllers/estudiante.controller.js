@@ -15,7 +15,8 @@ export const getAllEstudiantes = async (req, res) => {
 
 export const getEstudianteById = async (req, res) => {
     try {
-        const estudiante = await Estudiante.getEstudianteById(req.user.id)
+        const { id } = req.params
+        const estudiante = await Estudiante.getEstudianteById(id)
 
         if (!estudiante) {
             return res.status(404).send({success: false, message: 'Estudiante no encontrado' })
@@ -32,12 +33,12 @@ export const getEstudianteById = async (req, res) => {
 
 export const agregarCurso = async (req, res) => {
     try {
-        const { cursoId } = req.params
+        const { estudianteId, cursoId } = req.params
 
-        const estudiante = await Estudiante.getEstudianteById(req.user.id)
+        const estudiante = await Estudiante.getEstudianteById(estudianteId)
 
         if (!estudiante) {
-            return res.status(404).send({success: false, message: 'Estudiante no encontrado' })
+            return res.status(404).send({success: false, message: 'Estudiante no encontrado'})
         }
 
         const curso = await Curso.getCursoById(cursoId)
@@ -46,27 +47,25 @@ export const agregarCurso = async (req, res) => {
             return res.status(404).send({ success: false, message: 'Curso no encontrado' })
         }
 
-        estudiante.agregarCurso(curso._id)
+        const agregado = estudiante.agregarCurso(curso._id)
+
+        if (!agregado) {
+            return res.status(400).send({success: false, message: 'El estudiante ya tiene este curso' })
+        }
 
         await estudiante.save()
-
-        return res.status(200).send({
-            success: true,
-            message: 'Curso agregado correctamente',
-            estudiante
-        })
+        return res.status(200).send({success: true, message: 'Curso agregado correctamente', estudiante})
 
     } catch (err) {
         console.error(err)
-        return res.status(500).send({success: false, message: 'Error al agregar el curso' })
+        return res.status(500).send({success: false, message: 'Error al agregar el curso'})
     }
 }
 
 export const eliminarCurso = async (req, res) => {
     try {
-        const { cursoId } = req.params
-
-        const estudiante = await Estudiante.getEstudianteById(req.user.id)
+        const { estudianteId, cursoId } = req.params
+        const estudiante = await Estudiante.getEstudianteById(estudianteId)
 
         if (!estudiante) {
             return res.status(404).send({success: false, message: 'Estudiante no encontrado' })

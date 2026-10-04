@@ -1,31 +1,47 @@
 import Usuario  from "../models/Usuario.js"
+import Estudiante from "../models/Estudiante.js"
 import { encrypt, checkPassword } from '../../utils/encrypt.js'
 import { generateJwt } from '../../utils/jwt.js'
 
 export const register = async (req, res) => {
-    try{
-        const { nombre, correo, contrasena } = req.body
+    try {
+        const {
+            nombre,
+            correo,
+            contrasena,
+            tipoUsuario,
+            carnet
+        } = req.body
 
-        //Encrypted password
         const contrasenaEncriptada = await encrypt(contrasena)
 
-        const usuario = new Usuario({
-            nombre, correo, contrasena: contrasenaEncriptada
-        })
+        let usuario
+
+        if (tipoUsuario === 'Estudiante') {
+
+            usuario = new Estudiante({nombre, correo, contrasena: contrasenaEncriptada, carnet })
+
+        } else {
+
+            usuario = new Usuario({ nombre, correo, contrasena: contrasenaEncriptada })
+        }
 
         await usuario.save()
 
-        return res.status(201).send({succes: true, message: 'Usuario registrado correctamente',
+        return res.status(201).send({
+            success: true,
+            message: 'Usuario registrado correctamente',
             usuario: {
                 id: usuario._id,
                 nombre: usuario.nombre,
-                correo: usuario.correo
+                correo: usuario.correo,
+                tipoUsuario: usuario.tipoUsuario
             }
         })
 
     } catch (err) {
         console.error(err)
-        return res.status(500).send({success: false, message: 'Error al registrar al usuario'})
+        return res.status(500).send({success: false, message: 'Error al registrar usuario' })
     }
 }
 

@@ -17,9 +17,6 @@ const estudianteSchema = new mongoose.Schema(
             }
         ]
     },
-    {
-        versionKey: false
-    }
 )
 
 
@@ -32,15 +29,35 @@ estudianteSchema.statics.getAllEstudiantes = async function() {
 }
 
 estudianteSchema.methods.agregarCurso = function(cursoId) {
-    if (!this.cursos.includes(cursoId)) {
-        this.cursos.push(cursoId)
+    const cursoExiste = this.cursos.some(curso => {
+        const id = curso._id ? curso._id.toString() : curso.toString()
+
+        return id === cursoId.toString()
+    })
+
+    if (cursoExiste) {
+        return false
     }
+
+    this.cursos.push(cursoId)
+
+    return true
 }
 
 estudianteSchema.methods.eliminarCurso = function(cursoId) {
-    this.cursos = this.cursos.filter(
-        curso => curso.toString() !== cursoId.toString()
+    const cursoExiste = this.cursos.some(
+        curso => curso.equals(cursoId)
     )
+
+    if (!cursoExiste) {
+        return false
+    }
+
+    this.cursos = this.cursos.filter(
+        curso => !curso.equals(cursoId)
+    )
+
+    return true
 }
 
 const Estudiante = Usuario.discriminator(

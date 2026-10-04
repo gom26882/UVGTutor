@@ -34,9 +34,6 @@ const tutorSchema = new mongoose.Schema(
             }
         ]
     },
-    {
-        versionKey: false
-    }
 )
 
 tutorSchema.statics.getAllTutores = async function() {

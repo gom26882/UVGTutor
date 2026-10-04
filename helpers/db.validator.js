@@ -1,5 +1,6 @@
 import Usuario from '../src/models/Usuario.js'
 import Curso from '../src/models/Curso.js'
+import Estudiante from '../src/models/Estudiante.js'
 
 export const existEmail = async (correo) => {
     const usuarioExistente = await Usuario.findOne({ correo })

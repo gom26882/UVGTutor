@@ -13,25 +13,25 @@ import { validateJwt } from '../../middlewares/validate.jwt.js'
 const router = Router()
 
 router.get(
-    '/',
+    '/getAllEstudiantes',
     validateJwt,
     getAllEstudiantes
 )
 
 router.get(
-    '/profile',
+    '/getEstudiante/:id',
     validateJwt,
     getEstudianteById
 )
 
 router.post(
-    '/curso/:cursoId',
+    '/:estudianteId/addCurso/:cursoId',
     validateJwt,
     agregarCurso
 )
 
 router.delete(
-    '/curso/:cursoId',
+    '/:estudianteId/deleteCurso/:cursoId',
     validateJwt,
     eliminarCurso
 )

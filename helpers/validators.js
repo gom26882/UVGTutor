@@ -8,6 +8,13 @@ export const registerValidator = [
         .withMessage('El correo no es válido').custom(existEmail),
     body('contrasena').notEmpty() .withMessage('La contraseña no puede estar vacía')
         .isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
+    body('tipoUsuario')
+        .notEmpty().withMessage('El tipo de usuario no puede estar vacío')
+        .isIn(['Estudiante', 'Tutor']).withMessage('El tipo de usuario debe ser Estudiante o Tutor'),
+    body('carnet')
+        .if(body('tipoUsuario').equals('Estudiante')).trim().notEmpty()
+        .withMessage('El carnet no puede estar vacío').isLength({ min: 5, max: 5 })
+        .withMessage('El carnet debe tener 5 caracteres').custom(existCarnet),
     validateErrors
 ]
 
