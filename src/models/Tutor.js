@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import Usuario from './Usuario.js'
+import { MODALIDAD } from '../utils/constants.js'
 
 const tutorSchema = new mongoose.Schema(
     {
@@ -18,7 +19,7 @@ const tutorSchema = new mongoose.Schema(
         modalidad: {
             type: String,
             required: true,
-            enum: ['PRESENCIAL', 'VIRTUAL']
+            enum: Object.values(MODALIDAD)
         },
 
         cursos: [
