@@ -72,3 +72,18 @@ export const horarioValidator = [
     body('horario').notEmpty().withMessage('El horario no puede estar vacío').isISO8601().withMessage('El horario debe ser una fecha válida'),
     validateErrors
 ]
+
+export const tutoriaValidator = [
+    body('tutorId').notEmpty().withMessage('El tutor no puede estar vacío')
+        .isMongoId().withMessage('El ID del tutor no es válido'),
+    body('cursoId').notEmpty().withMessage('El curso no puede estar vacío')
+        .isMongoId().withMessage('El ID del curso no es válido'),
+    body('fecha').notEmpty().withMessage('La fecha no puede estar vacía')
+        .isISO8601().withMessage('La fecha no es válida'),
+    body('cantidadHoras').notEmpty().withMessage('La cantidad de horas no puede estar vacía')
+        .isFloat({min: 1}).withMessage('La cantidad de horas debe ser mayor o igual a 1'),
+    body('modalidad').notEmpty().withMessage('La modalidad no puede estar vacía')
+        .isIn(['PRESENCIAL', 'VIRTUAL']).withMessage('La modalidad debe ser PRESENCIAL o VIRTUAL'),
+
+    validateErrors
+]
