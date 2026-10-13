@@ -57,15 +57,11 @@ tutoriaSchema.statics.getTutoriaById = async function(id) {
 }
 
 tutoriaSchema.statics.getTutoriasByEstudiante = async function(estudianteId) {
-    return await this.find({estudiante: estudianteId})
-        .populate('tutor')
-        .populate('curso')
+    return await this.find({estudiante: estudianteId}).populate('tutor').populate('curso')
 }
 
 tutoriaSchema.statics.getTutoriasByTutor = async function(tutorId) {
-    return await this.find({tutor: tutorId})
-        .populate('estudiante')
-        .populate('curso')
+    return await this.find({tutor: tutorId}).populate('estudiante').populate('curso')
 }
 
 tutoriaSchema.methods.aceptarTutoria = function() {

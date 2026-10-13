@@ -21,7 +21,7 @@ import {
 const router = Router()
 
 router.get(
-    '/',
+    '/getAllTutores',
     validateJwt,
     getAllTutores
 )

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import Usuario from './Usuario.js'
-import { MODALIDAD } from '../utils/constants.js'
+import { MODALIDAD } from '../../constants/modalidad.js'
+
 
 const tutorSchema = new mongoose.Schema(
     {

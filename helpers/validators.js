@@ -84,6 +84,5 @@ export const tutoriaValidator = [
         .isFloat({min: 1}).withMessage('La cantidad de horas debe ser mayor o igual a 1'),
     body('modalidad').notEmpty().withMessage('La modalidad no puede estar vacía')
         .isIn(['PRESENCIAL', 'VIRTUAL']).withMessage('La modalidad debe ser PRESENCIAL o VIRTUAL'),
-
     validateErrors
 ]
