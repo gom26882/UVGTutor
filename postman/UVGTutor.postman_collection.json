@@ -303,6 +303,368 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Estudiante",
+      "item": [
+        {
+          "name": "GETALL_Estudiantes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/estudiante/getAllEstudiantes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "estudiante",
+                "getAllEstudiantes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET_Estudiante",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/estudiante/getEstudiante/6ab48d4933c05b29b7b99d67",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "estudiante",
+                "getEstudiante",
+                "6ab48d4933c05b29b7b99d67"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST_addCursoEstudiante",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "http://localhost:3641/v1/estudiante/6ab48d4933c05b29b7b99d67/addCurso/6aa361228e7b7e2ec79c4175",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "estudiante",
+                "6ab48d4933c05b29b7b99d67",
+                "addCurso",
+                "6aa361228e7b7e2ec79c4175"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE_deleteCursoEstudiante",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/estudiante/6ab48d4933c05b29b7b99d67/deleteCurso/6aa361228e7b7e2ec79c4175",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "estudiante",
+                "6ab48d4933c05b29b7b99d67",
+                "deleteCurso",
+                "6aa361228e7b7e2ec79c4175"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tutor",
+      "item": [
+        {
+          "name": "POST_addCurso",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/tutor/curso/6aa35f0bb55d811bcc2a5b59",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutor",
+                "curso",
+                "6aa35f0bb55d811bcc2a5b59"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST_addHorario",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"horario\": \"2026-10-20T15:00:00-06:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3641/v1/tutor/horario",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutor",
+                "horario"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tutoria",
+      "item": [
+        {
+          "name": "POST_solicitarTutoria",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"tutorId\": \"6aceb750f8581309495d7b77\",\n    \"cursoId\": \"6aa35f0bb55d811bcc2a5b59\",\n    \"fecha\": \"2026-10-20T15:00:00-06:00\",\n    \"cantidadHoras\": 1,\n    \"modalidad\": \"PRESENCIAL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3641/v1/tutoria/solicitar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutoria",
+                "solicitar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT_aceptarTutoria",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/tutoria/aceptar/6aceb8aff8581309495d7b78",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutoria",
+                "aceptar",
+                "6aceb8aff8581309495d7b78"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET_Tutoria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/tutoria/6aceb8aff8581309495d7b78",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutoria",
+                "6aceb8aff8581309495d7b78"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT_rechazarTutoria",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/tutoria/rechazar/6aceb9d9f8581309495d7b79",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutoria",
+                "rechazar",
+                "6aceb9d9f8581309495d7b79"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT_calcelarTutoria",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/tutoria/cancelar/6aceb8aff8581309495d7b78",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutoria",
+                "cancelar",
+                "6aceb8aff8581309495d7b78"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT_completarTutoria",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/tutoria/completar/6aceb8aff8581309495d7b78",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutoria",
+                "completar",
+                "6aceb8aff8581309495d7b78"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET_allTutoriasTutor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/tutoria/tutor",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutoria",
+                "tutor"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET_allTutoriaEstudiantes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3641/v1/tutoria/estudiante",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3641",
+              "path": [
+                "v1",
+                "tutoria",
+                "estudiante"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "auth": {
