@@ -7,14 +7,16 @@ import {
     agregarCurso,
     eliminarCurso,
     agregarHorario,
-    eliminarHorario
+    eliminarHorario,
+    getTutoresByModalidad
 } from '../controllers/tutor.controller.js'
 
 import { validateJwt } from '../../middlewares/validate.jwt.js'
 
 import {
     updateTutorValidator,
-    horarioValidator
+    horarioValidator,
+    modalidadValidator
 } from '../../helpers/validators.js'
 
 
@@ -63,6 +65,13 @@ router.delete(
     validateJwt,
     horarioValidator,
     eliminarHorario
+)
+
+router.get(
+    '/modalidad/:modalidad',
+    validateJwt,
+    modalidadValidator,
+    getTutoresByModalidad
 )
 
 export default router

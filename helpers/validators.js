@@ -1,6 +1,8 @@
 import { body } from 'express-validator'
 import { validateErrors } from './validate.errors.js'
 import { existEmail, existCodigoCurso, existCarnet } from './db.validator.js'
+import { param } from 'express-validator'
+import { MODALIDAD } from '../constants/modalidad.js'
 
 export const registerValidator = [
     body('nombre').notEmpty().withMessage('El nombre no puede estar vacío'),
@@ -84,5 +86,10 @@ export const tutoriaValidator = [
         .isFloat({min: 1}).withMessage('La cantidad de horas debe ser mayor o igual a 1'),
     body('modalidad').notEmpty().withMessage('La modalidad no puede estar vacía')
         .isIn(['PRESENCIAL', 'VIRTUAL']).withMessage('La modalidad debe ser PRESENCIAL o VIRTUAL'),
+    validateErrors
+]
+
+export const modalidadValidator = [
+    param('modalidad').isIn(Object.values(MODALIDAD)).withMessage('La modalidad debe ser PRESENCIAL o VIRTUAL'),
     validateErrors
 ]

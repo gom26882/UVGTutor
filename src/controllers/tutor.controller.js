@@ -12,6 +12,18 @@ export const getAllTutores = async (req, res) => {
     }
 }
 
+export const getTutoresByModalidad = async (req, res) => {
+    try{
+        const { modalidad } = req.params
+        const tutores = await Tutor.getTutoresByModalidad(modalidad)
+        return res.status(200).send({success: true, tutores})
+
+    } catch(err){
+        console.error(err)
+        return res.status(500).send({success: false, message: 'Error al filtrar tutores por modalidad'})
+    }
+}
+
 export const getTutorById = async (req, res) => {
     try {
         const tutor = await Tutor.getTutorById(req.user.id)

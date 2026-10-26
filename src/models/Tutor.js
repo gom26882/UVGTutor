@@ -2,7 +2,6 @@ import mongoose from 'mongoose'
 import Usuario from './Usuario.js'
 import { MODALIDAD } from '../../constants/modalidad.js'
 
-
 const tutorSchema = new mongoose.Schema(
     {
         experiencia: {
@@ -40,6 +39,10 @@ const tutorSchema = new mongoose.Schema(
 
 tutorSchema.statics.getAllTutores = async function() {
     return await this.find().populate('cursos')
+}
+
+tutorSchema.statics.getTutoresByModalidad = async function(modalidad) {
+    return await this.find({modalidad}).populate('cursos')
 }
 
 tutorSchema.statics.getTutorById = async function(id) {
@@ -101,7 +104,6 @@ tutorSchema.methods.estaDisponible = function(horario) {
         disponible => disponible.getTime() === fecha
     )
 }
-
 
 const Tutor = Usuario.discriminator(
     'Tutor',

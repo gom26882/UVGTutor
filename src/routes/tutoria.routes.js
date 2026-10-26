@@ -8,11 +8,11 @@ import {
     aceptarTutoria,
     rechazarTutoria,
     cancelarTutoria,
-    completarTutoria
+    completarTutoria,
 } from '../controllers/tutoria.controller.js'
 
 import { validateJwt } from '../../middlewares/validate.jwt.js'
-import { tutoriaValidator } from '../../helpers/validators.js'
+import { tutoriaValidator, updateTutorValidator} from '../../helpers/validators.js'
 
 const router = Router()
 
