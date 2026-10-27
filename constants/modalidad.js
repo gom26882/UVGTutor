@@ -1,0 +1,4 @@
+export const MODALIDAD = {
+    PRESENCIAL: 'PRESENCIAL',
+    VIRTUAL: 'VIRTUAL'
+}
