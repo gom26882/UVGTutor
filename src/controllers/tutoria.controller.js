@@ -27,8 +27,8 @@ export const solicitarTutoria = async (req, res) => {
             return res.status(404).send({success: false, message: 'Curso no encontrado'})
         }
 
-        const imparteCurso = tutor.cursos.some(cursoTutor => cursoTutor.equals(curso._id))
-
+        const imparteCurso = tutor.cursos.some(cursoTutor => cursoTutor._id.equals(curso._id))
+        
         if (!imparteCurso) {
             return res.status(400).send({success: false, message: 'El tutor no imparte este curso'})
         }

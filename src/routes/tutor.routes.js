@@ -8,7 +8,8 @@ import {
     eliminarCurso,
     agregarHorario,
     eliminarHorario,
-    getTutoresByModalidad
+    getTutoresByModalidad,
+    getTutorPublicoById
 } from '../controllers/tutor.controller.js'
 
 import { validateJwt } from '../../middlewares/validate.jwt.js'
@@ -72,6 +73,12 @@ router.get(
     validateJwt,
     modalidadValidator,
     getTutoresByModalidad
+)
+
+router.get(
+    '/:id',
+    validateJwt,
+    getTutorPublicoById
 )
 
 export default router

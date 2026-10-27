@@ -1,3 +1,4 @@
+
 import mongoose from 'mongoose'
 import Usuario from './Usuario.js'
 import { MODALIDAD } from '../../constants/modalidad.js'
@@ -46,7 +47,7 @@ tutorSchema.statics.getTutoresByModalidad = async function(modalidad) {
 }
 
 tutorSchema.statics.getTutorById = async function(id) {
-    return await this.findById(id)
+    return await this.findById(id).populate('cursos')
 }
 
 tutorSchema.methods.updateTutor = function(experiencia, precioHora, modalidad) {
@@ -57,29 +58,24 @@ tutorSchema.methods.updateTutor = function(experiencia, precioHora, modalidad) {
 
 tutorSchema.methods.agregarCurso = function(cursoId) {
     const cursoExiste = this.cursos.some(
-        curso => curso.equals(cursoId)
+        curso => curso._id.equals(cursoId)
     )
 
-    if (cursoExiste) {
-        return false
-    }
+    if (cursoExiste) return false
 
     this.cursos.push(cursoId)
-
     return true
 }
 
 tutorSchema.methods.eliminarCurso = function(cursoId) {
     const cursoExiste = this.cursos.some(
-        curso => curso.equals(cursoId)
+        curso => curso._id.equals(cursoId)
     )
 
-    if (!cursoExiste) {
-        return false
-    }
+    if (!cursoExiste) return false
 
     this.cursos = this.cursos.filter(
-        curso => !curso.equals(cursoId)
+        curso => !curso._id.equals(cursoId)
     )
 
     return true
@@ -105,9 +101,6 @@ tutorSchema.methods.estaDisponible = function(horario) {
     )
 }
 
-const Tutor = Usuario.discriminator(
-    'Tutor',
-    tutorSchema
-)
+const Tutor = Usuario.discriminator('Tutor', tutorSchema)
 
 export default Tutor
