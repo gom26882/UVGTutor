@@ -20,6 +20,12 @@ const usuarioSchema = new mongoose.Schema(
             type: String,
             required: true,
             select: false
+        },
+
+        telefono: {
+            type: String,
+            trim: true,
+            default: ''
         }
     },
     {
@@ -28,9 +34,10 @@ const usuarioSchema = new mongoose.Schema(
     }
 )
 
-usuarioSchema.methods.actualizarPerfil = function(nombre, correo) {
+usuarioSchema.methods.actualizarPerfil = function(nombre, correo, telefono) {
     this.nombre = nombre
     this.correo = correo
+    if (telefono !== undefined) this.telefono = telefono
 }
 
 usuarioSchema.statics.getUserById = async function(id) {
