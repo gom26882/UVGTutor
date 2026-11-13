@@ -45,8 +45,10 @@ estudianteSchema.methods.agregarCurso = function(cursoId) {
 }
 
 estudianteSchema.methods.eliminarCurso = function(cursoId) {
+    const idDe = curso => (curso._id ? curso._id.toString() : curso.toString())
+
     const cursoExiste = this.cursos.some(
-        curso => curso.equals(cursoId)
+        curso => idDe(curso) === cursoId.toString()
     )
 
     if (!cursoExiste) {
@@ -54,7 +56,7 @@ estudianteSchema.methods.eliminarCurso = function(cursoId) {
     }
 
     this.cursos = this.cursos.filter(
-        curso => !curso.equals(cursoId)
+        curso => idDe(curso) !== cursoId.toString()
     )
 
     return true
