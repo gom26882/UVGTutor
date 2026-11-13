@@ -82,7 +82,11 @@ tutorSchema.methods.eliminarCurso = function(cursoId) {
 }
 
 tutorSchema.methods.agregarHorario = function(horario) {
+    if (this.estaDisponible(horario)) return false
+
     this.horariosDisponibles.push(horario)
+    this.horariosDisponibles.sort((a, b) => a - b)
+    return true
 }
 
 tutorSchema.methods.eliminarHorario = function(horario) {

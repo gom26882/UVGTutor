@@ -10,6 +10,8 @@ export const registerValidator = [
         .withMessage('El correo no es válido').custom(existEmail),
     body('contrasena').notEmpty() .withMessage('La contraseña no puede estar vacía')
         .isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
+    body('telefono').trim().notEmpty().withMessage('El teléfono no puede estar vacío')
+        .matches(/^\+?[\d\s-]{8,16}$/).withMessage('El teléfono debe tener al menos 8 dígitos (ej. 5555-1234 o +502 5555 1234)'),
     body('tipoUsuario')
         .notEmpty().withMessage('El tipo de usuario no puede estar vacío')
         .isIn(['Estudiante', 'Tutor']).withMessage('El tipo de usuario debe ser Estudiante o Tutor'),
@@ -35,6 +37,8 @@ export const loginValidator = [
 export const updateProfileValidator = [
     body('nombre').notEmpty().withMessage('El nombre no puede estar vacío'),
     body('correo').notEmpty().withMessage('El correo no puede estar vacío').isEmail().withMessage('El correo no es válido'),
+    body('telefono').optional({ values: 'falsy' }).trim()
+        .matches(/^\+?[\d\s-]{8,16}$/).withMessage('El teléfono debe tener al menos 8 dígitos (ej. 5555-1234 o +502 5555 1234)'),
     validateErrors
 ]
 
@@ -86,6 +90,16 @@ export const tutoriaValidator = [
         .isFloat({min: 1}).withMessage('La cantidad de horas debe ser mayor o igual a 1'),
     body('modalidad').notEmpty().withMessage('La modalidad no puede estar vacía')
         .isIn(['PRESENCIAL', 'VIRTUAL']).withMessage('La modalidad debe ser PRESENCIAL o VIRTUAL'),
+    body('detalles').optional().isString().trim()
+        .isLength({ max: 500 }).withMessage('Los detalles no pueden superar 500 caracteres'),
+    validateErrors
+]
+
+export const motivoValidator = [
+    body('motivo').optional().isString().trim()
+        .isLength({ max: 100 }).withMessage('El motivo no puede superar 100 caracteres'),
+    body('mensaje').optional().isString().trim()
+        .isLength({ max: 300 }).withMessage('El mensaje no puede superar 300 caracteres'),
     validateErrors
 ]
 

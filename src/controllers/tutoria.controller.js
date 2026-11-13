@@ -4,10 +4,26 @@ import Tutor from '../models/Tutor.js'
 import Curso from '../models/Curso.js'
 import { MODALIDAD } from '../../constants/modalidad.js'
 import { ESTADO_TUTORIA } from '../../constants/estadoTutoria.js'
+import { bloquesDe, buscarCruce, horasSeguidasDisponibles } from '../../helpers/horarios.js'
+
+const ESTADOS_CON_CONTACTO = [ESTADO_TUTORIA.ACEPTADA, ESTADO_TUTORIA.COMPLETADA]
+
+const ocultarContactoSiNoAplica = (tutoria) => {
+    const objeto = tutoria.toObject ? tutoria.toObject() : tutoria
+    if (!ESTADOS_CON_CONTACTO.includes(objeto.estado)) {
+        if (objeto.tutor && typeof objeto.tutor === 'object') delete objeto.tutor.telefono
+        if (objeto.estudiante && typeof objeto.estudiante === 'object') delete objeto.estudiante.telefono
+    }
+    return objeto
+}
+
+const formatoHora = fecha => new Date(fecha).toLocaleTimeString('es-GT', {
+    hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Guatemala'
+})
 
 export const solicitarTutoria = async (req, res) => {
     try {
-        const { tutorId, cursoId, fecha, cantidadHoras, modalidad } = req.body
+        const { tutorId, cursoId, fecha, cantidadHoras, modalidad, detalles } = req.body
 
         const estudiante = await Estudiante.getEstudianteById(req.user.id)
 
@@ -48,11 +64,37 @@ export const solicitarTutoria = async (req, res) => {
         const fechaTutoria = new Date(fecha)
 
         if (Number.isNaN(fechaTutoria.getTime()) || fechaTutoria <= new Date()) {
-            return res.status(400).send({success: false, message: 'La fecha debe ser válida y futura'})
+            return res.status(400).send({success: false, message: 'La fecha debe ser valida'})
         }
 
         if (!tutor.estaDisponible(fechaTutoria)) {
-            return res.status(400).send({success: false, message: 'El tutor no está disponible en ese horario'})
+            return res.status(400).send({success: false, message: 'El tutor no esta disponible en ese horario'})
+        }
+
+        const horasSeguidas = horasSeguidasDisponibles(tutor.horariosDisponibles, fechaTutoria)
+
+        if (horasSeguidas < Number(cantidadHoras)) {
+            return res.status(400).send({
+                success: false,
+                message: `Desde las ${formatoHora(fechaTutoria)} el tutor solo tiene ${horasSeguidas} hora(s) seguida(s) disponible(s)`
+            })
+        }
+
+        const confirmadas = await Tutoria.getConfirmadasDeTutor(tutor._id)
+
+        if (buscarCruce(confirmadas, fechaTutoria, cantidadHoras)) {
+            return res.status(400).send({success: false, message: 'Ese horario se cruza con otra tutoría que el tutor ya confirmó'})
+        }
+
+        const solicitudDuplicada = await Tutoria.findOne({
+            estudiante: estudiante._id,
+            tutor: tutor._id,
+            fecha: fechaTutoria,
+            estado: { $in: [ESTADO_TUTORIA.PENDIENTE, ESTADO_TUTORIA.ACEPTADA] }
+        })
+
+        if (solicitudDuplicada) {
+            return res.status(400).send({success: false, message: 'Ya tienes una solicitud activa con este tutor en ese horario'})
         }
 
         const precioTotal = tutor.precioHora * Number(cantidadHoras)
@@ -64,7 +106,8 @@ export const solicitarTutoria = async (req, res) => {
             fecha: fechaTutoria,
             cantidadHoras: Number(cantidadHoras),
             modalidad,
-            precioTotal
+            precioTotal,
+            detalles: detalles || ''
         })
 
         await tutoria.save()
@@ -92,7 +135,13 @@ export const getTutoriaById = async (req, res) => {
             return res.status(403).send({success: false, message: 'No tienes acceso a esta tutoría'})
         }
 
-        return res.status(200).send({success: true, tutoria})
+        await tutoria.populate([
+            { path: 'estudiante', select: 'nombre correo carnet telefono' },
+            { path: 'tutor', select: 'nombre correo modalidad precioHora telefono' },
+            { path: 'curso' }
+        ])
+
+        return res.status(200).send({success: true, tutoria: ocultarContactoSiNoAplica(tutoria)})
     } catch (err) {
         console.error(err)
         return res.status(500).send({success: false, message: 'Error al obtener la tutoría'})
@@ -107,7 +156,7 @@ export const getTutoriasByEstudiante = async (req, res) => {
             return res.status(404).send({success: false, message: 'Estudiante no encontrado'})
         }
 
-        const tutorias = await Tutoria.getTutoriasByEstudiante(estudiante._id)
+        const tutorias = (await Tutoria.getTutoriasByEstudiante(estudiante._id)).map(ocultarContactoSiNoAplica)
 
         return res.status(200).send({success: true, tutorias})
     } catch (err) {
@@ -124,7 +173,7 @@ export const getTutoriasByTutor = async (req, res) => {
             return res.status(404).send({success: false, message: 'Tutor no encontrado'})
         }
 
-        const tutorias = await Tutoria.getTutoriasByTutor(tutor._id)
+        const tutorias = (await Tutoria.getTutoriasByTutor(tutor._id)).map(ocultarContactoSiNoAplica)
 
         return res.status(200).send({success: true, tutorias})
     } catch (err) {
@@ -147,6 +196,35 @@ export const aceptarTutoria = async (req, res) => {
             return res.status(403).send({success: false, message: 'No puedes aceptar esta tutoría'})
         }
 
+        if (new Date(tutoria.fecha) <= new Date()) {
+            return res.status(400).send({success: false, message: 'No puedes aceptar una tutoría cuya fecha ya pasó'})
+        }
+
+        const tutor = await Tutor.findById(tutoria.tutor)
+
+        if (!tutor) {
+            return res.status(404).send({success: false, message: 'Tutor no encontrado'})
+        }
+
+        const confirmadas = await Tutoria.getConfirmadasDeTutor(tutor._id, tutoria._id)
+        const cruce = buscarCruce(confirmadas, tutoria.fecha, tutoria.cantidadHoras)
+
+        if (cruce) {
+            return res.status(400).send({
+                success: false,
+                message: `Se cruza con otra tutoría que ya aceptaste a las ${formatoHora(cruce.fecha)}`
+            })
+        }
+
+        const bloquesLibres = bloquesDe(tutoria.fecha, tutoria.cantidadHoras).every(bloque => tutor.estaDisponible(bloque))
+
+        if (!bloquesLibres) {
+            return res.status(400).send({
+                success: false,
+                message: `Ya no tienes las ${tutoria.cantidadHoras} hora(s) seguidas disponibles desde las ${formatoHora(tutoria.fecha)}`
+            })
+        }
+
         const aceptada = tutoria.aceptarTutoria()
 
         if (!aceptada) {
@@ -154,6 +232,30 @@ export const aceptarTutoria = async (req, res) => {
         }
 
         await tutoria.save()
+
+        bloquesDe(tutoria.fecha, tutoria.cantidadHoras).forEach(bloque => tutor.eliminarHorario(bloque))
+        await tutor.save()
+
+        const pendientes = await Tutoria.find({
+            _id: { $ne: tutoria._id },
+            tutor: tutor._id,
+            estado: ESTADO_TUTORIA.PENDIENTE
+        }).select('fecha cantidadHoras')
+
+        const idsQueSeCruzan = pendientes
+            .filter(pendiente => buscarCruce([tutoria], pendiente.fecha, pendiente.cantidadHoras))
+            .map(pendiente => pendiente._id)
+
+        await Tutoria.updateMany(
+            { _id: { $in: idsQueSeCruzan } },
+            {
+                $set: {
+                    estado: ESTADO_TUTORIA.RECHAZADA,
+                    motivoRechazo: 'Horario ocupado',
+                    mensajeRechazo: 'El tutor aceptó otra tutoría que se cruza con este horario. Intenta con otro horario disponible.'
+                }
+            }
+        )
 
         return res.status(200).send({success: true, message: 'Tutoría aceptada correctamente', tutoria})
     } catch (err) {
@@ -176,7 +278,9 @@ export const rechazarTutoria = async (req, res) => {
             return res.status(403).send({success: false, message: 'No puedes rechazar esta tutoría'})
         }
 
-        const rechazada = tutoria.rechazarTutoria()
+        const { motivo, mensaje } = req.body
+
+        const rechazada = tutoria.rechazarTutoria(motivo, mensaje)
 
         if (!rechazada) {
             return res.status(400).send({success: false, message: 'La tutoría no puede ser rechazada'})
@@ -208,13 +312,31 @@ export const cancelarTutoria = async (req, res) => {
             return res.status(403).send({success: false, message: 'No puedes cancelar esta tutoría'})
         }
 
-        const cancelada = tutoria.cancelarTutoria()
+        if (new Date(tutoria.fecha) <= new Date()) {
+            return res.status(400).send({success: false, message: 'No se puede cancelar una tutoría que ya inició'})
+        }
+
+        const estabaAceptada = tutoria.estado === ESTADO_TUTORIA.ACEPTADA
+        const { motivo, mensaje } = req.body
+
+        const cancelada = tutoria.cancelarTutoria(esTutor ? 'Tutor' : 'Estudiante', motivo, mensaje)
 
         if (!cancelada) {
             return res.status(400).send({success: false, message: 'La tutoría no puede ser cancelada'})
         }
 
         await tutoria.save()
+
+        if (estabaAceptada) {
+            const tutor = await Tutor.findById(tutoria.tutor)
+
+            if (tutor) {
+                bloquesDe(tutoria.fecha, tutoria.cantidadHoras)
+                    .filter(bloque => bloque > new Date())
+                    .forEach(bloque => tutor.agregarHorario(bloque))
+                await tutor.save()
+            }
+        }
 
         return res.status(200).send({success: true, message: 'Tutoría cancelada correctamente', tutoria})
     } catch (err) {
