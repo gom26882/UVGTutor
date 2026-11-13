@@ -11,6 +11,7 @@ export const register = async (req, res) => {
             nombre,
             correo,
             contrasena,
+            telefono,
             tipoUsuario,
             carnet,
             experiencia,
@@ -27,6 +28,7 @@ export const register = async (req, res) => {
                 nombre,
                 correo,
                 contrasena: contrasenaEncriptada,
+                telefono,
                 carnet
             })
         } else if (tipoUsuario === 'Tutor') {
@@ -34,6 +36,7 @@ export const register = async (req, res) => {
                 nombre,
                 correo,
                 contrasena: contrasenaEncriptada,
+                telefono,
                 experiencia,
                 precioHora,
                 modalidad

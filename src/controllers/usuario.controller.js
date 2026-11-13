@@ -1,4 +1,33 @@
 import Usuario from '../models/Usuario.js'
+import Estudiante from '../models/Estudiante.js'
+import Tutor from '../models/Tutor.js'
+
+const construirPerfil = async (usuario) => {
+    const perfil = {
+        id: usuario._id,
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        telefono: usuario.telefono || '',
+        tipoUsuario: usuario.tipoUsuario
+    }
+
+    if (usuario.tipoUsuario === 'Estudiante') {
+        const estudiante = await Estudiante.getEstudianteById(usuario._id)
+        perfil.carnet = estudiante?.carnet
+        perfil.cursos = estudiante?.cursos || []
+    }
+
+    if (usuario.tipoUsuario === 'Tutor') {
+        const tutor = await Tutor.getTutorById(usuario._id)
+        perfil.experiencia = tutor?.experiencia
+        perfil.precioHora = tutor?.precioHora
+        perfil.modalidad = tutor?.modalidad
+        perfil.cursos = tutor?.cursos || []
+        perfil.horariosDisponibles = tutor?.horariosDisponibles || []
+    }
+
+    return perfil
+}
 
 export const getUserById = async (req, res) =>{
     try{
@@ -8,41 +37,40 @@ export const getUserById = async (req, res) =>{
             return res.status(404).send({success: false, message: 'Usuario no encontrado'})
         }
 
-        return res.status(200).send({success:true, usuario:{
-            id: usuario._id,
-            nombre: usuario.nombre,
-            correo: usuario.correo
-        }})
+        return res.status(200).send({success: true, usuario: await construirPerfil(usuario)})
 
     } catch (err){
         console.error(err)
-        return res.status(500).send({succes: false, message: 'Errror al obtener el usuario'})
+        return res.status(500).send({success: false, message: 'Error al obtener el usuario'})
     }
 }
 
 
 export const updateUser = async (req, res) =>{
     try{
-        const { nombre, correo} = req.body
+        const { nombre, correo, telefono } = req.body
+        const correoNormalizado = String(correo).trim().toLowerCase()
 
         const usuario = await Usuario.findById(req.user.id)
 
         if (!usuario){
-            return res.status(404).send({success: false, message:'Usuario no encontrad'})
+            return res.status(404).send({success: false, message:'Usuario no encontrado'})
         }
 
-        usuario.actualizarPerfil(nombre, correo)
+        const correoEnUso = await Usuario.findOne({ correo: correoNormalizado, _id: { $ne: usuario._id } })
+
+        if (correoEnUso) {
+            return res.status(400).send({success: false, message: `El correo ${correoNormalizado} ya está registrado`})
+        }
+
+        usuario.actualizarPerfil(nombre, correoNormalizado, telefono !== undefined ? String(telefono).trim() : undefined)
         await usuario.save()
 
         return res.status(200).send({success: true, message: 'Perfil de usuario actualizado correctamente',
-            usuario: {
-                id: usuario._id,
-                nombre: usuario.nombre,
-                correo: usuario.correo
-            }
+            usuario: await construirPerfil(usuario)
         })
     }catch (err){
         console.error(err)
-        return res.status(500).send({succes: false, message:'Errro al actualizar el perfil'})
+        return res.status(500).send({success: false, message:'Error al actualizar el perfil'})
     }
 }

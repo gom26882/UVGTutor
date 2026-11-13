@@ -9,7 +9,7 @@ export const createCurso = async (req, res) =>{
 
         await curso.save()
 
-        return res.status(200).send({success: true, message: 'Curso agregado correctamente'})
+        return res.status(201).send({success: true, message: 'Curso agregado correctamente', curso})
 
     }catch(err){
         console.error(err)
