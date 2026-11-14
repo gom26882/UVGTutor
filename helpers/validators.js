@@ -1,6 +1,6 @@
 import { body } from 'express-validator'
 import { validateErrors } from './validate.errors.js'
-import { existEmail, existCodigoCurso, existCarnet } from './db.validator.js'
+import { existEmail, existTelefono, existCodigoCurso, existCarnet } from './db.validator.js'
 import { param } from 'express-validator'
 import { MODALIDAD } from '../constants/modalidad.js'
 
@@ -10,8 +10,7 @@ export const registerValidator = [
         .withMessage('El correo no es válido').custom(existEmail),
     body('contrasena').notEmpty() .withMessage('La contraseña no puede estar vacía')
         .isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
-    body('telefono').trim().notEmpty().withMessage('El teléfono no puede estar vacío')
-        .matches(/^\+?[\d\s-]{8,16}$/).withMessage('El teléfono debe tener al menos 8 dígitos (ej. 5555-1234 o +502 5555 1234)'),
+    body('telefono').trim().notEmpty().withMessage('El teléfono no puede estar vacío').matches(/^\d{8}$/).withMessage('El teléfono debe contener exactamente 8 números').custom(existTelefono),
     body('tipoUsuario')
         .notEmpty().withMessage('El tipo de usuario no puede estar vacío')
         .isIn(['Estudiante', 'Tutor']).withMessage('El tipo de usuario debe ser Estudiante o Tutor'),
@@ -35,10 +34,36 @@ export const loginValidator = [
 ]
 
 export const updateProfileValidator = [
-    body('nombre').notEmpty().withMessage('El nombre no puede estar vacío'),
-    body('correo').notEmpty().withMessage('El correo no puede estar vacío').isEmail().withMessage('El correo no es válido'),
-    body('telefono').optional({ values: 'falsy' }).trim()
-        .matches(/^\+?[\d\s-]{8,16}$/).withMessage('El teléfono debe tener al menos 8 dígitos (ej. 5555-1234 o +502 5555 1234)'),
+    body('nombre')
+        .trim()
+        .notEmpty()
+        .withMessage('El nombre no puede estar vacío'),
+
+    body('correo')
+        .trim()
+        .notEmpty()
+        .withMessage('El correo no puede estar vacío')
+        .isEmail()
+        .withMessage('El correo no es válido'),
+
+    body('telefono')
+        .optional({ values: 'falsy' })
+        .trim()
+        .matches(/^\d{8}$/)
+        .withMessage('El teléfono debe contener exactamente 8 números')
+        .custom((telefono, { req }) => {
+            return existTelefono(telefono, req.user.id);
+        }),
+
+    body('fotoPerfil')
+        .optional({ values: 'falsy' })
+        .isString()
+        .withMessage('La fotografía debe tener un formato válido')
+        .isLength({ max: 700000 })
+        .withMessage('La fotografía es demasiado pesada')
+        .matches(/^data:image\/(jpeg|png|webp);base64,/)
+        .withMessage('La fotografía debe ser JPG, PNG o WEBP'),
+
     validateErrors
 ]
 

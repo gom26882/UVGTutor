@@ -1,21 +1,67 @@
 import Curso from '../models/Curso.js'
 
-export const createCurso = async (req, res) =>{
-    try{
+export const createCurso = async (req, res) => {
+    try {
+        const codigo = String(req.body.codigo)
+            .trim()
+            .toUpperCase();
 
-        const {codigo, nombre} = req.body
+        const nombre = String(req.body.nombre)
+            .trim()
+            .replace(/\s+/g, ' ');
 
-        const curso = new Curso({codigo, nombre})
+        const nombreSeguro = nombre.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            '\\$&'
+        );
 
-        await curso.save()
+        const cursoExistente = await Curso.findOne({
+            $or: [
+                { codigo },
+                {
+                    nombre: {
+                        $regex: `^${nombreSeguro}$`,
+                        $options: 'i'
+                    }
+                }
+            ]
+        });
 
-        return res.status(201).send({success: true, message: 'Curso agregado correctamente', curso})
+        if (cursoExistente) {
+            return res.status(409).send({
+                success: false,
+                message: `El curso ${cursoExistente.nombre} (${cursoExistente.codigo}) ya existe. Selecciónalo desde el catálogo.`
+            });
+        }
 
-    }catch(err){
-        console.error(err)
-        return res.status(500).send({success:false, message:'Error al crear el curso'})
+        const curso = new Curso({
+            codigo,
+            nombre
+        });
+
+        await curso.save();
+
+        return res.status(201).send({
+            success: true,
+            message: 'Curso agregado correctamente',
+            curso
+        });
+    } catch (err) {
+        console.error(err);
+
+        if (err.code === 11000) {
+            return res.status(409).send({
+                success: false,
+                message: 'Ya existe un curso con ese código.'
+            });
+        }
+
+        return res.status(500).send({
+            success: false,
+            message: 'Error al crear el curso'
+        });
     }
-}
+};
 
 export const getAllCursos = async (req, res) =>{
     try{

@@ -2,6 +2,10 @@ import Usuario from '../src/models/Usuario.js'
 import Curso from '../src/models/Curso.js'
 import Estudiante from '../src/models/Estudiante.js'
 
+const normalizarTelefono = telefono => {
+    return String(telefono || '').replace(/\D/g, '');
+};
+
 export const existEmail = async (correo) => {
     const usuarioExistente = await Usuario.findOne({ correo })
 
@@ -9,6 +13,28 @@ export const existEmail = async (correo) => {
         throw new Error(`El correo ${correo} ya está registrado`)
     }
 }
+
+export const existTelefono = async (telefono, usuarioId = null) => {
+    const telefonoNormalizado = normalizarTelefono(telefono);
+
+    const filtro = {
+        telefono: telefonoNormalizado
+    };
+
+    if (usuarioId) {
+        filtro._id = {
+            $ne: usuarioId
+        };
+    }
+
+    const usuarioExistente = await Usuario.findOne(filtro);
+
+    if (usuarioExistente) {
+        throw new Error('Este número de teléfono ya está registrado');
+    }
+
+    return true;
+};
 
 export const findUser = async (id) => {
     try {

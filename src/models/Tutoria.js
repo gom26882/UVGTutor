@@ -115,14 +115,14 @@ tutoriaSchema.statics.getConfirmadasPorTutor = async function() {
 
 tutoriaSchema.statics.getTutoriasByEstudiante = async function(estudianteId) {
     return await this.find({estudiante: estudianteId})
-        .populate('tutor', 'nombre correo modalidad precioHora telefono')
+        .populate('tutor', 'nombre correo modalidad precioHora telefono fotoPerfil')
         .populate('curso')
         .sort({fecha: -1})
 }
 
 tutoriaSchema.statics.getTutoriasByTutor = async function(tutorId) {
     return await this.find({tutor: tutorId})
-        .populate('estudiante', 'nombre correo carnet telefono')
+        .populate('estudiante', 'nombre correo carnet telefono fotoPerfil')
         .populate('curso')
         .sort({fecha: -1})
 }
