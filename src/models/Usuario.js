@@ -25,7 +25,14 @@ const usuarioSchema = new mongoose.Schema(
         telefono: {
             type: String,
             trim: true,
-            default: ''
+            default: '',
+            set: valor => String(valor || '').replace(/\D/g, '')
+        },
+
+        fotoPerfil: {
+            type: String,
+            default: '',
+            maxlength: 700000
         }
     },
     {
@@ -34,10 +41,22 @@ const usuarioSchema = new mongoose.Schema(
     }
 )
 
-usuarioSchema.methods.actualizarPerfil = function(nombre, correo, telefono) {
-    this.nombre = nombre
-    this.correo = correo
-    if (telefono !== undefined) this.telefono = telefono
+usuarioSchema.methods.actualizarPerfil = function(
+    nombre,
+    correo,
+    telefono,
+    fotoPerfil
+) {
+    this.nombre = nombre;
+    this.correo = correo;
+
+    if (telefono !== undefined) {
+        this.telefono = telefono;
+    }
+
+    if (fotoPerfil !== undefined) {
+        this.fotoPerfil = fotoPerfil;
+    }
 }
 
 usuarioSchema.statics.getUserById = async function(id) {

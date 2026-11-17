@@ -8,6 +8,7 @@ const construirPerfil = async (usuario) => {
         nombre: usuario.nombre,
         correo: usuario.correo,
         telefono: usuario.telefono || '',
+        fotoPerfil: usuario.fotoPerfil || '',
         tipoUsuario: usuario.tipoUsuario
     }
 
@@ -48,7 +49,12 @@ export const getUserById = async (req, res) =>{
 
 export const updateUser = async (req, res) =>{
     try{
-        const { nombre, correo, telefono } = req.body
+        const {
+            nombre,
+            correo,
+            telefono,
+            fotoPerfil
+        } = req.body
         const correoNormalizado = String(correo).trim().toLowerCase()
 
         const usuario = await Usuario.findById(req.user.id)
@@ -63,7 +69,16 @@ export const updateUser = async (req, res) =>{
             return res.status(400).send({success: false, message: `El correo ${correoNormalizado} ya está registrado`})
         }
 
-        usuario.actualizarPerfil(nombre, correoNormalizado, telefono !== undefined ? String(telefono).trim() : undefined)
+        const telefonoNormalizado = telefono !== undefined
+            ? String(telefono).replace(/\D/g, '')
+            : undefined;
+
+        usuario.actualizarPerfil(
+            nombre,
+            correoNormalizado,
+            telefonoNormalizado,
+            fotoPerfil
+        );
         await usuario.save()
 
         return res.status(200).send({success: true, message: 'Perfil de usuario actualizado correctamente',
